@@ -53,6 +53,29 @@ func handlerRegister(s *state, cmd command) error {
 		log.Fatal(err)
 	}
 	s.cfg.SetUser(user.Name)
-	fmt.Printf("User has been created %+v\n", user)
+	fmt.Printf("User has been created %s\n", user.Name)
+	return nil
+}
+
+func handlerReset(s *state, cmd command) error {
+	err := s.db.DeleteUsers(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func usersHandler(s *state, cmd command) error {
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, user := range users {
+		if user.Name == s.cfg.CurrentUserName {
+			fmt.Printf("* %s (current)\n", user.Name)
+			continue
+		}
+		fmt.Printf("* %s\n", user.Name)
+	}
 	return nil
 }
