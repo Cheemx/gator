@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"os"
 
 	"github.com/Cheemx/gator/internal/config"
 )
@@ -12,13 +12,21 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	err = conf.SetUser("Cheems")
-	if err != nil {
-		log.Panic(err)
+	st := state{
+		cfg: &conf,
 	}
-	conf, err = config.Read()
-	if err != nil {
-		log.Panic(err)
+	cmds := commands{
+		cmdFuncMap: make(map[string]func(*state, command) error),
 	}
-	fmt.Println(conf)
+	cmds.register("login", handlerLogin)
+	args := os.Args
+	if len(args) < 2 {
+		log.Println("the application expects at least 2 arguments for command and username")
+		os.Exit(1)
+	}
+	if len(args) < 3 {
+		log.Println("username is required")
+		os.Exit(1)
+	}
+	cmds.run(&st, command{name: args[1], args: args[1:]})
 }
