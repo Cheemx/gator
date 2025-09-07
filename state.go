@@ -65,7 +65,7 @@ func handlerReset(s *state, cmd command) error {
 	return nil
 }
 
-func usersHandler(s *state, cmd command) error {
+func handlerUsers(s *state, cmd command) error {
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil {
 		log.Fatal(err)
@@ -77,5 +77,14 @@ func usersHandler(s *state, cmd command) error {
 		}
 		fmt.Printf("* %s\n", user.Name)
 	}
+	return nil
+}
+
+func handlerAgg(s *state, cmd command) error {
+	feed, err := fetchFeed(context.Background(), feedURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%+v\n", *feed)
 	return nil
 }
