@@ -13,7 +13,7 @@ SELECT * FROM users
 WHERE name = $1;
 
 -- name: DeleteUsers :exec
-TRUNCATE TABLE users;
+TRUNCATE TABLE users CASCADE;
 
 -- name: GetUsers :many
 SELECT * FROM users;
