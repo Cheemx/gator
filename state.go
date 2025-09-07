@@ -111,3 +111,19 @@ func handlerAddFeed(s *state, cmd command) error {
 	fmt.Printf("%+v\n", feed)
 	return nil
 }
+
+func handlerGetFeeds(s *state, cmd command) error {
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, feed := range feeds {
+		feedUserName, err := s.db.GetUserFromFeed(context.Background(), feed.ID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Name of the feed: %s\nURL of the feed: %s\nCreator of the feed: %s\n", feed.Name, feed.Url, feedUserName)
+		fmt.Println()
+	}
+	return nil
+}
