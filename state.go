@@ -87,13 +87,9 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.args) < 3 {
 		log.Fatal("Please Enter name and URL of the feed")
-	}
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		log.Fatal(err)
 	}
 	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -136,16 +132,11 @@ func handlerGetFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.args) < 2 {
 		log.Fatal("URL is required")
 	}
 	feed, err := s.db.GetFeedByURL(context.Background(), cmd.args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -163,11 +154,7 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowing(s *state, cmd command) error {
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		log.Fatal(err)
-	}
+func handlerFollowing(s *state, cmd command, user database.User) error {
 	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		log.Fatal(err)
