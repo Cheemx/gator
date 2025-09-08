@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/Cheemx/gator/internal/config"
@@ -24,8 +23,7 @@ type command struct {
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) < 2 {
-		log.Println("username is required")
-		os.Exit(1)
+		log.Fatal("username is required")
 	}
 	_, err := s.db.GetUser(context.Background(), cmd.args[1])
 	if err != nil {
@@ -108,7 +106,17 @@ func handlerAddFeed(s *state, cmd command) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%+v\n", feed)
+	feedFollow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Name of the feed: %s\nName of the current User: %s\n", feedFollow.FeedName, feedFollow.UserName)
 	return nil
 }
 
@@ -124,6 +132,48 @@ func handlerGetFeeds(s *state, cmd command) error {
 		}
 		fmt.Printf("Name of the feed: %s\nURL of the feed: %s\nCreator of the feed: %s\n", feed.Name, feed.Url, feedUserName)
 		fmt.Println()
+	}
+	return nil
+}
+
+func handlerFollow(s *state, cmd command) error {
+	if len(cmd.args) < 2 {
+		log.Fatal("URL is required")
+	}
+	feed, err := s.db.GetFeedByURL(context.Background(), cmd.args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	feedFollow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Name of the feed: %s\nName of the current User: %s\n", feedFollow.FeedName, feedFollow.UserName)
+	return nil
+}
+
+func handlerFollowing(s *state, cmd command) error {
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, feed := range feedFollows {
+		fmt.Println(feed.FeedName)
 	}
 	return nil
 }
