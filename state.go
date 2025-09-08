@@ -164,3 +164,21 @@ func handlerFollowing(s *state, cmd command, user database.User) error {
 	}
 	return nil
 }
+
+func handlerUnfollowing(s *state, cmd command, user database.User) error {
+	if len(cmd.args) < 2 {
+		log.Fatal("Enter the URL to unfollow feed")
+	}
+	feed, err := s.db.GetFeedByURL(context.Background(), cmd.args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = s.db.DeleteUniqueFeedFollow(context.Background(), database.DeleteUniqueFeedFollowParams{
+		FeedID: feed.ID,
+		UserID: user.ID,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
