@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func Read() (Config, error) {
@@ -29,6 +29,6 @@ func getConfigFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	filePath := fmt.Sprintf("%s/%s", home, configFileName)
+	filePath := filepath.Join(home, configFileName)
 	return filePath, nil
 }
