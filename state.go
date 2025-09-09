@@ -79,11 +79,26 @@ func handlerUsers(s *state, cmd command) error {
 }
 
 func handlerAgg(s *state, cmd command) error {
-	feed, err := fetchFeed(context.Background(), feedURL)
+	if len(cmd.args) < 2 {
+		log.Fatal("Please Enter time between consecutive requests e.g. 1m: 1 min;1s,2h45m")
+	}
+	timeBetweenReqs, err := time.ParseDuration(cmd.args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%+v\n", *feed)
+	fmt.Printf("Collecting feeds every %v\n", timeBetweenReqs)
+	err = scrapeFeeds(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	ticker := time.NewTicker(timeBetweenReqs)
+	for ; ; <-ticker.C {
+		err = scrapeFeeds(s)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+	}
 	return nil
 }
 
