@@ -215,7 +215,7 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 		log.Fatal(err)
 	}
 	for _, post := range posts {
-		fmt.Printf("Post: %+v\n", post)
+		printPost(post)
 		fmt.Println("")
 	}
 	return nil
