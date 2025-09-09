@@ -2,6 +2,8 @@
 
 A RSS feed aggregator CLI tool implemented in Go with PostgreSQL backend. Gator allows you to manage RSS feeds, follow your favourite sources, and browse aggregated posts from the command line.
 
+![gator](/gator.png)
+*AI generated img*
 ## Prerequisites
 
 Before installing and using Gator, ensure you have the following installed:
