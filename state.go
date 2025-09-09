@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/Cheemx/gator/internal/config"
@@ -99,7 +100,6 @@ func handlerAgg(s *state, cmd command) error {
 			continue
 		}
 	}
-	return nil
 }
 
 func handlerAddFeed(s *state, cmd command, user database.User) error {
@@ -194,6 +194,29 @@ func handlerUnfollowing(s *state, cmd command, user database.User) error {
 	})
 	if err != nil {
 		log.Fatal(err)
+	}
+	return nil
+}
+
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	if len(cmd.args) == 1 {
+		cmd.args = append(cmd.args, "2")
+	}
+	limit := cmd.args[1]
+	lim64, err := strconv.ParseInt(limit, 10, 32)
+	if err != nil {
+		log.Fatal(err)
+	}
+	posts, err := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{
+		UserID: user.ID,
+		Limit:  int32(lim64),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, post := range posts {
+		fmt.Printf("Post: %+v\n", post)
+		fmt.Println("")
 	}
 	return nil
 }
